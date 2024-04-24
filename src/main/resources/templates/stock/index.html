@@ -24,6 +24,7 @@
                             <th>在庫管理番号</th>
                             <th>書籍名</th>
                             <th>在庫ステータス</th>
+                            <th>貸出情報</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,6 +38,7 @@
                             </td>
                             <td th:text="*{bookMst.title}"></td>
                             <td th:text="${stock.status == 0 && (#lists.isEmpty(stock.rentalManages) || stock.rentalManages[0].status != 1) ? '利用可' : '利用不可'}"></td>
+                            <td>
                         </tr>
                     </tbody>
                 </table>
