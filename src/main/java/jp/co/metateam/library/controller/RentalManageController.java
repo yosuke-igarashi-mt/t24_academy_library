@@ -27,13 +27,13 @@ import jp.co.metateam.library.model.Stock;
 @Log4j2
 @Controller
 public class RentalManageController {
-    private final BookMstService bookMstService;
+    // private final BookMstService bookMstService;
     private final StockService stockService;
     private final AccountService accountService;
     private final RentalManageService rentalManageService;
 
     @Autowired
-    public RentalManageController(BookMstService bookMstService,
+     public RentalManageController(BookMstService bookMstService,
         AccountService accountService, 
         RentalManageService rentalManageService, 
         StockService stockService
@@ -41,7 +41,7 @@ public class RentalManageController {
         this.accountService = accountService;
         this.rentalManageService = rentalManageService;
         this.stockService = stockService;
-        this.bookMstService = bookMstService;
+        // this.bookMstService = bookMstService;
     }
 
     /**
@@ -56,9 +56,8 @@ public class RentalManageController {
          return "rental/index";
      }
     
-      @GetMapping("/rental/add")
-      public String add(Model model,@ModelAttribute RentalManageDto rentalManageDto) {
-          List<RentalManage> rentalManageList = this.rentalManageService.findAll();
+       @GetMapping("/rental/add")
+       public String add(Model model,@ModelAttribute RentalManageDto rentalManageDto) {
           List<Account> accounts=this.accountService.findAll();
           List<Stock> stockList=this.stockService.findAll();
        
@@ -90,7 +89,7 @@ public class RentalManageController {
 
             ra.addFlashAttribute("rentalManageDto", rentalManageDto);
             ra.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
-
+            
             return "redirect:/rental/add";
         }
     }
