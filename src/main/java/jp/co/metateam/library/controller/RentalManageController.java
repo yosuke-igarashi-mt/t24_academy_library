@@ -128,7 +128,12 @@ public class RentalManageController {
 
             ra.addFlashAttribute("rentalManageDto", rentalManageDto);
             ra.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
-            
+            List<Account> accounts = this.accountService.findAll();
+            List<Stock> stockList = this.stockService.findStockAvailableAll();
+
+            model.addAttribute("accounts", accounts);
+            model.addAttribute("stockList", stockList);
+            model.addAttribute("rentalStatus", RentalStatus.values());
             return "rental/add";
         }
     }
