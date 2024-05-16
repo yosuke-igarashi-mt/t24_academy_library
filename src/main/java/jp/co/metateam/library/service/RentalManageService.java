@@ -1,12 +1,13 @@
+
 package jp.co.metateam.library.service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import jp.co.metateam.library.model.Account;
 import jp.co.metateam.library.model.RentalManage;
 import jp.co.metateam.library.model.RentalManageDto;
@@ -23,20 +24,19 @@ public class RentalManageService {
     private final RentalManageRepository rentalManageRepository;
     private final StockRepository stockRepository;
 
-     @Autowired
+    @Autowired
     public RentalManageService(
-        AccountRepository accountRepository,
-        RentalManageRepository rentalManageRepository,
-        StockRepository stockRepository
-    ) {
+            AccountRepository accountRepository,
+            RentalManageRepository rentalManageRepository,
+            StockRepository stockRepository) {
         this.accountRepository = accountRepository;
         this.rentalManageRepository = rentalManageRepository;
         this.stockRepository = stockRepository;
     }
 
     @Transactional
-    public List <RentalManage> findAll() {
-        List <RentalManage> rentalManageList = this.rentalManageRepository.findAll();
+    public List<RentalManage> findAll() {
+        List<RentalManage> rentalManageList = this.rentalManageRepository.findAll();
 
         return rentalManageList;
     }
@@ -46,7 +46,29 @@ public class RentalManageService {
         return this.rentalManageRepository.findById(id).orElse(null);
     }
 
-    @Transactional 
+    @Transactional
+    public Long countByStatusAndNotId(Long id, String stockid) {
+        return this.rentalManageRepository.countByStatusAndNotId(id, stockid);
+    }
+
+    @Transactional
+    public Long countByStatusAndExpectedReturnBeforeAndNotId(Date expectedRentalOn, Long id, Date expectedReturnOn,
+            String stockid) {
+        return this.rentalManageRepository.countByStatusAndExpectedReturnBeforeAndNotId(expectedRentalOn, id,
+                expectedReturnOn, stockid);
+    }
+
+    @Transactional
+    public Long countByStatusAndStockId(String stockId) {
+        return this.rentalManageRepository.countByStatusAndStockId(stockId);
+    }
+
+    @Transactional
+    public Long countByStockIdAndExpectedReturn(Date expectedRentalOn, Date expectedReturnOn, String stockid) {
+        return this.rentalManageRepository.countByStockIdAndExpectedReturn(expectedRentalOn, expectedReturnOn, stockid);
+    }
+
+    @Transactional
     public void save(RentalManageDto rentalManageDto) throws Exception {
         try {
             Account account = this.accountRepository.findByEmployeeId(rentalManageDto.getEmployeeId()).orElse(null);
@@ -77,8 +99,8 @@ public class RentalManageService {
 
     private RentalManage setRentalStatusDate(RentalManage rentalManage, Integer status) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        
-        if (status == RentalStatus.RENTAlING.getValue()) {
+
+        if (status == RentalStatus.RENTALING.getValue()) {
             rentalManage.setRentaledAt(timestamp);
         } else if (status == RentalStatus.RETURNED.getValue()) {
             rentalManage.setReturnedAt(timestamp);
@@ -87,5 +109,38 @@ public class RentalManageService {
         }
 
         return rentalManage;
+    }
+
+    @Transactional
+    public void update(Long id, RentalManageDto rentalManageDto) throws Exception {
+        try {
+            // 既存レコード取得
+            RentalManage updateTargetRental = this.rentalManageRepository.findById(id).orElse(null);
+            if (updateTargetRental == null) {
+                throw new Exception("RentalManage record not found.");
+            }
+
+            Account account = this.accountRepository.findByEmployeeId(rentalManageDto.getEmployeeId()).orElse(null);
+            if (account == null) {
+                throw new Exception("Account not found.");
+            }
+
+            Stock stock = this.stockRepository.findById(rentalManageDto.getStockId()).orElse(null);
+            if (stock == null) {
+                throw new Exception("Stock not found.");
+            }
+
+            updateTargetRental.setId(rentalManageDto.getId());
+            updateTargetRental.setAccount(account);
+            updateTargetRental.setExpectedRentalOn(rentalManageDto.getExpectedRentalOn());
+            updateTargetRental.setExpectedReturnOn(rentalManageDto.getExpectedReturnOn());
+            updateTargetRental.setStatus(rentalManageDto.getStatus());
+            updateTargetRental.setStock(stock);
+
+            // データベースへの保存
+            this.rentalManageRepository.save(updateTargetRental);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
