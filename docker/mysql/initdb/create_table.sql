@@ -62,7 +62,4 @@ CREATE TABLE IF NOT EXISTS mt_library.rental_manage
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY fk_stock_id (stock_id) REFERENCES stocks (id),
-    FOREIGN KEY fk_employee_id (employee_id) REFERENCES accounts (employee_id)
 )
-COMMENT = '貸出管理'
-ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
